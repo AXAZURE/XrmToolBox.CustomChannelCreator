@@ -1,0 +1,10 @@
+﻿################################################################################
+# Este archivo .gitignore ha sido creado automáticamente por Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/XrmToolBox.CustomChannelCreator/v17
+/.vs/XRMToolBoox.CustomChannelCreator
+/.vs
+/CustomChannelCreator/bin/Debug/Connections
+/CustomChannelCreator/bin/Debug/Logs/CustomChannelCreator.log
+/CustomChannelCreator/obj
