@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfMostRecentlyUsedItem xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <MostRecentlyUsedItem>
+    <ConnectionId>81ef9005-2b86-4158-be95-6625804d6684</ConnectionId>
+    <ConnectionName>PFU DEV COL</ConnectionName>
+    <Date>2024-08-27T12:10:31.5786671+02:00</Date>
+    <PluginName>Customer Insights Custom Channel Creator</PluginName>
+  </MostRecentlyUsedItem>
+</ArrayOfMostRecentlyUsedItem>
