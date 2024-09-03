@@ -224,7 +224,7 @@ namespace CustomChannelCreator
             messagePart.Attributes.Add("msdyn_maxlength", 1000);
             messagePart.Attributes.Add("msdyn_name", text);
             messagePart.Attributes.Add("msdyn_type", new OptionSetValue(Int32.Parse(type)));
-            if (type == "LookUp")
+            if (type == "192350005")
             {
                 messagePart.Attributes.Add("msdyn_entityname", entityname);
                 messagePart.Attributes.Add("msdyn_entityviewid", viewId);
