@@ -40,7 +40,7 @@ namespace CustomChannelCreator
         {
             //ShowInfoNotification("This is a notification that can lead to XrmToolBox repository", new Uri("https://github.com/MscrmTools/XrmToolBox"));
 
-            
+
             // Loads or creates the settings for the plugin
             if (!SettingsManager.Instance.TryLoad(GetType(), out mySettings))
             {
@@ -148,6 +148,7 @@ namespace CustomChannelCreator
             this.lookUp.Enabled = true;
             //this.viewId.Enabled = true;
             this.addButton.Enabled = true;
+            this.required.Enabled = true;
 
             var selected = this.listBox1.SelectedItem as CustomListBoxItem;
             if (selected.Text == "Lookup")
@@ -162,6 +163,7 @@ namespace CustomChannelCreator
                 this.label3.Hide();
                 this.viewId.Hide();
                 this.lookUp.Hide();
+                this.label7.Show();
             }
             this.type.Text = selected.Value;
 
@@ -172,12 +174,14 @@ namespace CustomChannelCreator
             var lookup = this.lookUp.SelectedItem != null ? (this.lookUp.SelectedItem as CustomListBoxItem).ToString() : "";
             var type = this.type.Text;
             var view = this.viewId.SelectedItem != null ? (this.viewId.SelectedItem as ComboboxItem)?.Value.Id.ToString() : "";
-            string[] row = { name, type, lookup, view };
+            var isRequired = this.required.Checked;
+            string[] row = { name, type,isRequired.ToString(), lookup, view };
 
             listView1.Items.Add(new System.Windows.Forms.ListViewItem(row));
             messagePartName.Enabled = false;
             messagePartName.Text = string.Empty;
             lookUp.Enabled = false;
+            required.Enabled = false;
             lookUp.SelectedItem = null;
             viewId.Enabled = false;
             viewId.SelectedItem = null;
@@ -189,106 +193,118 @@ namespace CustomChannelCreator
         private void Create_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
-
-            var solutionName = this.solutionName.Text;
-            var publisher = this.publisher.SelectedItem as ComboboxItem;
-
-            Entity solution = new Entity("solution");
-            solution.Attributes.Add("uniquename", solutionName.Replace(" ", string.Empty));
-            solution.Attributes.Add("friendlyname", solutionName);
-            solution.Attributes.Add("publisherid", publisher.Value.ToEntityReference());
-            solution.Attributes.Add("version", "1.0.0.0");
-            var solutionId = this.Service.Create(solution);
-
-            var entityChannelInstance = this.customChannelName.Text;
-            var prefix = publisher.Value.GetAttributeValue<string>("customizationprefix");
-            var entityChannelInstanceSchema = $"{prefix}_{entityChannelInstance.Replace(" ", string.Empty).ToLower()}channelinstance";
-
-            EntityMetadata customchannelinstanceMetadata = new EntityMetadata()
+            WorkAsync(new WorkAsyncInfo
             {
-                SchemaName = entityChannelInstanceSchema, //Required
-                DisplayName = new Label(entityChannelInstance, 1033),//Required
-                DisplayCollectionName = new Label(entityChannelInstance, 1033),//Required
-                HasNotes = false, //Required
-                HasActivities = false, //Required
-                Description = new Label(
-                           "A table to store information about custom channel instances", 1033),
-                OwnershipType = OwnershipTypes.UserOwned,
-
-            };
-            CreateEntityRequest createEntityRequest = new CreateEntityRequest
-            {
-                Entity = customchannelinstanceMetadata,
-                PrimaryAttribute = new StringAttributeMetadata
+                Message = "Loading...",
+                Work = (w, events) =>
                 {
-                    SchemaName = $"{prefix}_name",
-                    RequiredLevel = new AttributeRequiredLevelManagedProperty(AttributeRequiredLevel.None),
-                    MaxLength = 100,
-                    FormatName = StringFormatName.Text,
-                    DisplayName = new Label($"{entityChannelInstance} Channel Instance Name", 1033),
-                    Description = new Label("The primary column for the Bank Account table.", 1033)
+                    var solutionName = this.solutionName.Text;
+                    var publisher = this.publisher.SelectedItem as ComboboxItem;
+                    w.ReportProgress(-1, "Creating solution...");
+                    Entity solution = new Entity("solution");
+                    solution.Attributes.Add("uniquename", solutionName.Replace(" ", string.Empty));
+                    solution.Attributes.Add("friendlyname", solutionName);
+                    solution.Attributes.Add("publisherid", publisher.Value.ToEntityReference());
+                    solution.Attributes.Add("version", "1.0.0.0");
+                    var solutionId = this.Service.Create(solution);
+                    w.ReportProgress(-1, "Creating entity...");
+                    var entityChannelInstance = this.customChannelName.Text;
+                    var prefix = publisher.Value.GetAttributeValue<string>("customizationprefix");
+                    var entityChannelInstanceSchema = $"{prefix}_{entityChannelInstance.Replace(" ", string.Empty).ToLower()}channelinstance";
+
+                    EntityMetadata customchannelinstanceMetadata = new EntityMetadata()
+                    {
+                        SchemaName = entityChannelInstanceSchema, //Required
+                        DisplayName = new Label(entityChannelInstance, 1033),//Required
+                        DisplayCollectionName = new Label(entityChannelInstance, 1033),//Required
+                        HasNotes = false, //Required
+                        HasActivities = false, //Required
+                        Description = new Label(
+                                   "A table to store information about custom channel instances", 1033),
+                        OwnershipType = OwnershipTypes.UserOwned,
+
+                    };
+                    CreateEntityRequest createEntityRequest = new CreateEntityRequest
+                    {
+                        Entity = customchannelinstanceMetadata,
+                        PrimaryAttribute = new StringAttributeMetadata
+                        {
+                            SchemaName = $"{prefix}_name",
+                            RequiredLevel = new AttributeRequiredLevelManagedProperty(AttributeRequiredLevel.None),
+                            MaxLength = 100,
+                            FormatName = StringFormatName.Text,
+                            DisplayName = new Label($"{entityChannelInstance} Channel Instance Name", 1033),
+                            Description = new Label("The primary column for the Bank Account table.", 1033)
+                        },
+                        SolutionUniqueName = solutionName.Replace(" ", string.Empty)
+                    };
+                    this.Service.Execute(createEntityRequest);
+                    w.ReportProgress(-1, "Creating relationship...");
+                    var createRelationshipRequest = new CreateOneToManyRequest();
+                    var oneToManyRelationship = new OneToManyRelationshipMetadata
+                    {
+                        ReferencingEntity = "msdyn_channelinstance",
+                        ReferencedEntity = entityChannelInstanceSchema,
+                        ReferencingEntityNavigationPropertyName = $"msdyn_extendedentityid_{entityChannelInstanceSchema}",
+                        SchemaName = $"msdyn_extendedentityid_{entityChannelInstanceSchema}"
+                    };
+
+                    createRelationshipRequest.OneToManyRelationship = oneToManyRelationship;
+                    createRelationshipRequest.Parameters["Lookup"] = new LookupAttributeMetadata()
+                    {
+                        SchemaName = "msdyn_extendedentityId",
+                        DisplayName = new Label("Extended Entity Id", 1033),
+
+
+                    };
+                    createRelationshipRequest.SolutionUniqueName = solutionName.Replace(" ", string.Empty);
+
+                    this.Service.Execute(createRelationshipRequest);
+                    w.ReportProgress(-1, "Creation channel definition...");
+                    var retrieveEntityResponse = Utils.RetrieveEntityMetadata(this.Service, entityChannelInstanceSchema);
+
+                    var formQuery = new QueryExpression("systemform");
+                    formQuery.Criteria.AddCondition("objecttypecode", ConditionOperator.Equal, retrieveEntityResponse.EntityMetadata.ObjectTypeCode);
+                    formQuery.Criteria.AddCondition("type", ConditionOperator.Equal, 2);
+                    var form = this.Service.RetrieveMultiple(formQuery);
+
+
+                    Entity channelDefinition = Utils.CreateChannelDefinition(this.Service, entityChannelInstanceSchema, form.Entities.FirstOrDefault()?.Id.ToString(), entityChannelInstance, (this.customApi.SelectedItem as ComboboxItem).Text);
+
+                    var retrieveEntityChannelDefinitionResponse = Utils.RetrieveEntityMetadata(this.Service, "msdyn_channeldefinition");
+
+                    AddSolutionComponentRequest addSolutionComponentRequest = new AddSolutionComponentRequest()
+                    {
+                        ComponentType = retrieveEntityChannelDefinitionResponse.EntityMetadata.ObjectTypeCode.Value,
+                        ComponentId = channelDefinition.Id,
+                        SolutionUniqueName = solutionName.Replace(" ", string.Empty)
+                    };
+
+                    this.Service.Execute(addSolutionComponentRequest);
+                    w.ReportProgress(-1, "Creation messageparts...");
+                    var retrieveEntityChannelDefinitionMessagepartResponse = Utils.RetrieveEntityMetadata(this.Service, "msdyn_channelmessagepart");
+
+                    List<Entity> messageParts = new List<Entity>();
+                    foreach (ListViewItem mp in this.listView1.Items)
+                    {
+                        Entity messagePart = Utils.CreateMessagePart(this.Service, channelDefinition, mp.SubItems[0].Text, mp.SubItems[1].Text, mp.SubItems[2].Text, mp.SubItems[3].Text);
+                        messageParts.Add(messagePart);
+                        AddSolutionComponentRequest addSolutionComponentRequest2 = new AddSolutionComponentRequest()
+                        {
+                            ComponentType = retrieveEntityChannelDefinitionMessagepartResponse.EntityMetadata.ObjectTypeCode.Value,
+                            ComponentId = messagePart.Id,
+                            SolutionUniqueName = solutionName.Replace(" ", string.Empty)
+                        };
+                        this.Service.Execute(addSolutionComponentRequest2);
+                    }
+
                 },
-                SolutionUniqueName = solutionName.Replace(" ", string.Empty)
-            };
-            this.Service.Execute(createEntityRequest);
-
-            var createRelationshipRequest = new CreateOneToManyRequest();
-            var oneToManyRelationship = new OneToManyRelationshipMetadata
-            {
-                ReferencingEntity = "msdyn_channelinstance",
-                ReferencedEntity = entityChannelInstanceSchema,
-                ReferencingEntityNavigationPropertyName = $"msdyn_extendedentityid_{entityChannelInstanceSchema}",
-                SchemaName = $"msdyn_extendedentityid_{entityChannelInstanceSchema}"
-            };
-
-            createRelationshipRequest.OneToManyRelationship = oneToManyRelationship;
-            createRelationshipRequest.Parameters["Lookup"] = new LookupAttributeMetadata()
-            {
-                SchemaName = "msdyn_extendedentityId",
-                DisplayName = new Label("Extended Entity Id", 1033),
-
-
-            };
-            createRelationshipRequest.SolutionUniqueName = solutionName.Replace(" ", string.Empty);
-
-            this.Service.Execute(createRelationshipRequest);
-
-            var retrieveEntityResponse = Utils.RetrieveEntityMetadata(this.Service, entityChannelInstanceSchema);
-
-            var formQuery = new QueryExpression("systemform");
-            formQuery.Criteria.AddCondition("objecttypecode", ConditionOperator.Equal, retrieveEntityResponse.EntityMetadata.ObjectTypeCode);
-            formQuery.Criteria.AddCondition("type", ConditionOperator.Equal, 2);
-            var form = this.Service.RetrieveMultiple(formQuery);
-
+                AsyncArgument = null,
+                // Progress information panel size
+                MessageWidth = 340,
+                MessageHeight = 150
+            });
             
-            Entity channelDefinition = Utils.CreateChannelDefinition(this.Service, entityChannelInstanceSchema, form.Entities.FirstOrDefault()?.Id.ToString(), entityChannelInstance, (this.customApi.SelectedItem as ComboboxItem).Text);
-                       
-            var retrieveEntityChannelDefinitionResponse = Utils.RetrieveEntityMetadata(this.Service, "msdyn_channeldefinition");
-
-            AddSolutionComponentRequest addSolutionComponentRequest = new AddSolutionComponentRequest()
-            {
-                ComponentType = retrieveEntityChannelDefinitionResponse.EntityMetadata.ObjectTypeCode.Value,
-                ComponentId = channelDefinition.Id,
-                SolutionUniqueName = solutionName.Replace(" ", string.Empty)
-            };
-
-            this.Service.Execute(addSolutionComponentRequest);
-
-            var retrieveEntityChannelDefinitionMessagepartResponse = Utils.RetrieveEntityMetadata(this.Service, "msdyn_channelmessagepart");
-
-            List<Entity> messageParts = new List<Entity>();
-            foreach (ListViewItem mp in this.listView1.Items)
-            {
-                Entity messagePart = Utils.CreateMessagePart(this.Service, channelDefinition, mp.SubItems[0].Text, mp.SubItems[1].Text, mp.SubItems[2].Text, mp.SubItems[3].Text);
-                messageParts.Add(messagePart);
-                AddSolutionComponentRequest addSolutionComponentRequest2 = new AddSolutionComponentRequest()
-                {
-                    ComponentType = retrieveEntityChannelDefinitionMessagepartResponse.EntityMetadata.ObjectTypeCode.Value,
-                    ComponentId = messagePart.Id,
-                    SolutionUniqueName = solutionName.Replace(" ", string.Empty)
-                };
-                this.Service.Execute(addSolutionComponentRequest2);
-            }
             Cursor = Cursors.Default;
         }
 
@@ -300,34 +316,72 @@ namespace CustomChannelCreator
             this.customChannelName.Enabled = true;
             this.customApi.Enabled = true;
             this.listBox1.Enabled = true;
+            this.listView1.Enabled = true;
 
-            var queryPublisher = new QueryExpression("publisher");
-            queryPublisher.ColumnSet.AddColumns("customizationprefix", "uniquename", "friendlyname");
-            var items = this.Service.RetrieveMultiple(queryPublisher)?.Entities.Select(x => new ComboboxItem(x.GetAttributeValue<string>("friendlyname"), x)).OrderBy(x => x.Text).ToArray();
-            this.publisher.Items.AddRange(items);
+            IEnumerable<ComboboxItem> items = new List<ComboboxItem>();
+            IEnumerable<ComboboxItem> itemsCAPI = new List<ComboboxItem>();
+            IEnumerable<CustomListBoxItem> messageParts = new List<CustomListBoxItem>();
 
-            var queryCustomAPI = new QueryExpression("customapi");
-            queryCustomAPI.ColumnSet.AddColumns("uniquename", "displayname", "name");
-            var itemsCAPI = this.Service.RetrieveMultiple(queryCustomAPI)?.Entities.Select(x => new ComboboxItem(x.GetAttributeValue<string>("uniquename"), x)).OrderBy(x => x.Text).ToArray();
-            this.customApi.Items.AddRange(itemsCAPI);
-
-            List<CustomListBoxItem> listBox = new List<CustomListBoxItem>
+            WorkAsync(new WorkAsyncInfo
             {
-                new CustomListBoxItem("Text", "192350000"),
-                new CustomListBoxItem("Html", "192350001"),
-                new CustomListBoxItem("Url", "192350002"),
-                new CustomListBoxItem("Image", "192350004"),
-                new CustomListBoxItem("File", "192350003"),
-                new CustomListBoxItem("Lookup", "192350005")
-            };
+                Message = "Loading...",
+                Work = (w, events) =>
+                {
+                    // This code is executed in another thread
+                    //this.Cursor = Cursors.WaitCursor;
 
-            listBox.ForEach(x => this.listBox1.Items.Add(x));
+                    w.ReportProgress(-1, "Retrieving publishers...");
+                    var queryPublisher = new QueryExpression("publisher");
+                    queryPublisher.ColumnSet.AddColumns("customizationprefix", "uniquename", "friendlyname");
+                    items = this.Service.RetrieveMultiple(queryPublisher)?.Entities.Select(x => new ComboboxItem(x.GetAttributeValue<string>("friendlyname"), x)).OrderBy(x => x.Text);
+                    // this.publisher.Items.AddRange(items);
+                    w.ReportProgress(-1, "Retrieving Custom APIs");
+                    var queryCustomAPI = new QueryExpression("customapi");
+                    queryCustomAPI.ColumnSet.AddColumns("uniquename", "displayname", "name");
+                    itemsCAPI = this.Service.RetrieveMultiple(queryCustomAPI)?.Entities.Select(x => new ComboboxItem(x.GetAttributeValue<string>("uniquename"), x)).OrderBy(x => x.Text);
+                    //this.customApi.Items.AddRange(itemsCAPI);
+                    w.ReportProgress(-1, "Setting messageparts types");
 
-            RetrieveAllEntitiesRequest retrieveAllEntitiesRequest = new RetrieveAllEntitiesRequest();
-            retrieveAllEntitiesRequest.EntityFilters = EntityFilters.Entity;
-            retrieveAllEntitiesRequest.RetrieveAsIfPublished = false;
-            RetrieveAllEntitiesResponse retrieveAllEntitiesResponse = (RetrieveAllEntitiesResponse)this.Service.Execute(retrieveAllEntitiesRequest);
-            this.lookUp.Items.AddRange(retrieveAllEntitiesResponse.EntityMetadata.Select(x => new CustomListBoxItem(x.LogicalName, x.ObjectTypeCode.ToString())).OrderBy(x => x.Text).ToArray());
+
+                    RetrieveAllEntitiesRequest retrieveAllEntitiesRequest = new RetrieveAllEntitiesRequest();
+                    retrieveAllEntitiesRequest.EntityFilters = EntityFilters.Entity;
+                    retrieveAllEntitiesRequest.RetrieveAsIfPublished = false;
+                    RetrieveAllEntitiesResponse retrieveAllEntitiesResponse = (RetrieveAllEntitiesResponse)this.Service.Execute(retrieveAllEntitiesRequest);
+                    messageParts = retrieveAllEntitiesResponse.EntityMetadata.Select(x => new CustomListBoxItem(x.LogicalName, x.ObjectTypeCode.ToString())).OrderBy(x => x.Text);
+                    //this.lookUp.Items.AddRange(retrieveAllEntitiesResponse.EntityMetadata.Select(x => new CustomListBoxItem(x.LogicalName, x.ObjectTypeCode.ToString())).OrderBy(x => x.Text).ToArray());
+                    events.Result = true;
+                },
+                ProgressChanged = events =>
+                {
+                    // it will display "I have found the user id" in this example
+                    SetWorkingMessage(events.UserState.ToString());
+                },
+                PostWorkCallBack = events =>
+                {
+                    this.publisher.Items.AddRange(items.ToArray());
+                    this.customApi.Items.AddRange(itemsCAPI.ToArray());
+                    this.lookUp.Items.AddRange(messageParts.ToArray());
+                    List<CustomListBoxItem> listBox = new List<CustomListBoxItem>
+                    {
+                        new CustomListBoxItem("Text", "192350000"),
+                        new CustomListBoxItem("Html", "192350001"),
+                        new CustomListBoxItem("Url", "192350002"),
+                        new CustomListBoxItem("Image", "192350004"),
+                        new CustomListBoxItem("File", "192350003"),
+                        new CustomListBoxItem("Lookup", "192350005")
+                    };
+
+                    listBox.ForEach(x => this.listBox1.Items.Add(x));
+                    // This code is executed in the main thread
+                    //MessageBox.Show($"You are {(Guid)events.Result}");
+
+                },
+                AsyncArgument = null,
+                // Progress information panel size
+                MessageWidth = 340,
+                MessageHeight = 150
+            });
+            
             this.Cursor = Cursors.Default;
         }
         private void lookUp_SelectedIndexChanged(object sender, EventArgs e)
@@ -346,6 +400,16 @@ namespace CustomChannelCreator
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
         {
 
         }

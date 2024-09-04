@@ -65,6 +65,8 @@ namespace CustomChannelCreator
             this.label6 = new System.Windows.Forms.Label();
             this.viewId = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
+            this.required = new System.Windows.Forms.CheckBox();
+            this.RequiredHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.toolStripMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -80,7 +82,7 @@ namespace CustomChannelCreator
             this.toolStripMenu.Location = new System.Drawing.Point(0, 0);
             this.toolStripMenu.Name = "toolStripMenu";
             this.toolStripMenu.Padding = new System.Windows.Forms.Padding(0, 0, 3, 0);
-            this.toolStripMenu.Size = new System.Drawing.Size(1939, 39);
+            this.toolStripMenu.Size = new System.Drawing.Size(1551, 27);
             this.toolStripMenu.TabIndex = 4;
             this.toolStripMenu.Text = "toolStrip1";
             // 
@@ -88,14 +90,14 @@ namespace CustomChannelCreator
             // 
             this.tsbClose.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.tsbClose.Name = "tsbClose";
-            this.tsbClose.Size = new System.Drawing.Size(107, 36);
+            this.tsbClose.Size = new System.Drawing.Size(107, 24);
             this.tsbClose.Text = "Close this tool";
             this.tsbClose.Click += new System.EventHandler(this.tsbClose_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 39);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
             // 
             // LoadEntities
             // 
@@ -103,21 +105,21 @@ namespace CustomChannelCreator
             this.LoadEntities.Image = ((System.Drawing.Image)(resources.GetObject("LoadEntities.Image")));
             this.LoadEntities.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.LoadEntities.Name = "LoadEntities";
-            this.LoadEntities.Size = new System.Drawing.Size(94, 36);
+            this.LoadEntities.Size = new System.Drawing.Size(94, 24);
             this.LoadEntities.Text = "LoadEntities";
             this.LoadEntities.Click += new System.EventHandler(this.Load_Click_1);
             // 
             // tssSeparator1
             // 
             this.tssSeparator1.Name = "tssSeparator1";
-            this.tssSeparator1.Size = new System.Drawing.Size(6, 39);
+            this.tssSeparator1.Size = new System.Drawing.Size(6, 27);
             // 
             // Create
             // 
             this.Create.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.Create.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.Create.Name = "Create";
-            this.Create.Size = new System.Drawing.Size(56, 36);
+            this.Create.Size = new System.Drawing.Size(56, 24);
             this.Create.Text = "Create";
             this.Create.ToolTipText = "Create";
             this.Create.Click += new System.EventHandler(this.Create_Click);
@@ -158,13 +160,13 @@ namespace CustomChannelCreator
             this.listBox1.Location = new System.Drawing.Point(25, 288);
             this.listBox1.Margin = new System.Windows.Forms.Padding(4);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(295, 132);
+            this.listBox1.Size = new System.Drawing.Size(295, 164);
             this.listBox1.TabIndex = 9;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
             // addButton
             // 
-            this.addButton.Location = new System.Drawing.Point(584, 393);
+            this.addButton.Location = new System.Drawing.Point(583, 424);
             this.addButton.Margin = new System.Windows.Forms.Padding(4);
             this.addButton.Name = "addButton";
             this.addButton.Size = new System.Drawing.Size(100, 28);
@@ -175,7 +177,7 @@ namespace CustomChannelCreator
             // 
             // removeButton
             // 
-            this.removeButton.Location = new System.Drawing.Point(1323, 390);
+            this.removeButton.Location = new System.Drawing.Point(1380, 424);
             this.removeButton.Margin = new System.Windows.Forms.Padding(4);
             this.removeButton.Name = "removeButton";
             this.removeButton.Size = new System.Drawing.Size(100, 28);
@@ -221,6 +223,7 @@ namespace CustomChannelCreator
             this.label3.Size = new System.Drawing.Size(105, 16);
             this.label3.TabIndex = 16;
             this.label3.Text = "Entity Reference";
+            this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
             // listView1
             // 
@@ -230,6 +233,7 @@ namespace CustomChannelCreator
             this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.messagepartnamecolumn,
             this.typecolumn,
+            this.RequiredHeader,
             this.entitylookupcolumn,
             this.viewIdColumn});
             this.listView1.Cursor = System.Windows.Forms.Cursors.WaitCursor;
@@ -241,7 +245,7 @@ namespace CustomChannelCreator
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
             this.listView1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.listView1.Size = new System.Drawing.Size(586, 132);
+            this.listView1.Size = new System.Drawing.Size(639, 164);
             this.listView1.TabIndex = 17;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.UseWaitCursor = true;
@@ -260,13 +264,15 @@ namespace CustomChannelCreator
             // 
             // entitylookupcolumn
             // 
+            this.entitylookupcolumn.DisplayIndex = 2;
             this.entitylookupcolumn.Text = "Entity Lookup";
             this.entitylookupcolumn.Width = 100;
             // 
             // viewIdColumn
             // 
+            this.viewIdColumn.DisplayIndex = 3;
             this.viewIdColumn.Text = "Entity View";
-            this.viewIdColumn.Width = 100;
+            this.viewIdColumn.Width = 150;
             // 
             // solutionName
             // 
@@ -310,7 +316,7 @@ namespace CustomChannelCreator
             // 
             this.type.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.type.Enabled = false;
-            this.type.Location = new System.Drawing.Point(350, 396);
+            this.type.Location = new System.Drawing.Point(350, 430);
             this.type.Margin = new System.Windows.Forms.Padding(4);
             this.type.Name = "type";
             this.type.Size = new System.Drawing.Size(160, 22);
@@ -353,6 +359,22 @@ namespace CustomChannelCreator
             this.label7.Size = new System.Drawing.Size(137, 16);
             this.label7.TabIndex = 27;
             this.label7.Text = "View Entity Reference";
+            this.label7.Click += new System.EventHandler(this.label7_Click);
+            // 
+            // required
+            // 
+            this.required.AutoSize = true;
+            this.required.Location = new System.Drawing.Point(523, 397);
+            this.required.Name = "required";
+            this.required.Size = new System.Drawing.Size(85, 20);
+            this.required.TabIndex = 29;
+            this.required.Text = "Required";
+            this.required.UseVisualStyleBackColor = true;
+            // 
+            // RequiredHeader
+            // 
+            this.RequiredHeader.Text = "Required";
+            this.RequiredHeader.Width = 113;
             // 
             // CustomChannelCreator
             // 
@@ -360,6 +382,7 @@ namespace CustomChannelCreator
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.Controls.Add(this.required);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.viewId);
             this.Controls.Add(this.label6);
@@ -445,5 +468,7 @@ namespace CustomChannelCreator
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ColumnHeader viewIdColumn;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ColumnHeader RequiredHeader;
+        private System.Windows.Forms.CheckBox required;
     }
 }
