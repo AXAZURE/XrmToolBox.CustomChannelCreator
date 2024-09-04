@@ -214,13 +214,13 @@ namespace CustomChannelCreator
             channelDefinition.Id = channelDefinitionId;
             return channelDefinition;
         }
-        public static Entity CreateMessagePart(IOrganizationService service,Entity channelDefinition, string text, string type,string entityname,string viewId)
+        public static Entity CreateMessagePart(IOrganizationService service,Entity channelDefinition, string text, string type,string entityname,string viewId, string required)
         {
             Entity messagePart = new Entity("msdyn_channelmessagepart");
             messagePart.Attributes.Add("msdyn_channeldefinitionid", new EntityReference("msdyn_channeldefinition", channelDefinition.Id));
             messagePart.Attributes.Add("msdyn_description", text);
             messagePart.Attributes.Add("msdyn_displayname", text);
-            messagePart.Attributes.Add("msdyn_isrequired", true);
+            messagePart.Attributes.Add("msdyn_isrequired", bool.Parse(required));
             messagePart.Attributes.Add("msdyn_maxlength", 1000);
             messagePart.Attributes.Add("msdyn_name", text);
             messagePart.Attributes.Add("msdyn_type", new OptionSetValue(Int32.Parse(type)));

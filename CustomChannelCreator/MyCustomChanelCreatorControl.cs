@@ -287,7 +287,7 @@ namespace CustomChannelCreator
                     List<Entity> messageParts = new List<Entity>();
                     foreach (ListViewItem mp in this.listView1.Items)
                     {
-                        Entity messagePart = Utils.CreateMessagePart(this.Service, channelDefinition, mp.SubItems[0].Text, mp.SubItems[1].Text, mp.SubItems[2].Text, mp.SubItems[3].Text);
+                        Entity messagePart = Utils.CreateMessagePart(this.Service, channelDefinition, mp.SubItems[0].Text, mp.SubItems[1].Text, mp.SubItems[3].Text, mp.SubItems[4].Text, mp.SubItems[2].Text);
                         messageParts.Add(messagePart);
                         AddSolutionComponentRequest addSolutionComponentRequest2 = new AddSolutionComponentRequest()
                         {
