@@ -44,14 +44,18 @@
   <NumberOfDaysToShowNewRibbon>7</NumberOfDaysToShowNewRibbon>
   <ShowCategoriesExpanded>false</ShowCategoriesExpanded>
   <UseLegacyToolsList>false</UseLegacyToolsList>
-  <LastAdvertisementDisplay>2024-08-27T12:07:22.0560183+02:00</LastAdvertisementDisplay>
-  <LastConnection>PFU DEV COL</LastConnection>
+  <LastAdvertisementDisplay>2024-09-03T17:10:02.7683528+02:00</LastAdvertisementDisplay>
+  <LastConnection>Maria AGOSTO</LastConnection>
   <LastPlugin />
-  <LastUpdateCheck>2024-08-27T12:10:21.1302654+02:00</LastUpdateCheck>
+  <LastUpdateCheck>2024-09-05T10:27:18.2499294+02:00</LastUpdateCheck>
   <MostUsedList>
     <PluginUseCount>
-      <Count>72</Count>
+      <Count>84</Count>
       <Name>CustomChannelCreator.MyPlugin</Name>
+    </PluginUseCount>
+    <PluginUseCount>
+      <Count>7</Count>
+      <Name>Xrm.Sdk.PluginRegistration.Plugin</Name>
     </PluginUseCount>
   </MostUsedList>
   <OptinForApplicationInsights>true</OptinForApplicationInsights>

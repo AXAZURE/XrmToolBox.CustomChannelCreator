@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Settings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ExcludeManagedAssemblies>false</ExcludeManagedAssemblies>
+  <Mappings>
+    <PluginAssemblyFileMapping>
+      <ConnectionId>2bc37564-fdf4-4c37-995c-faa05aae1703</ConnectionId>
+      <FilePath>C:\Users\a.diez\Downloads\SampleCustomChannel02088\SampleCustomChannel\SampleCustomChannel.Plugins\bin\Debug\net471\DemoCustomChannelTwilio.Plugins.dll</FilePath>
+      <PluginAssemblyName>DemoCustomChannelTwilio.Plugins</PluginAssemblyName>
+    </PluginAssemblyFileMapping>
+  </Mappings>
+</Settings>
