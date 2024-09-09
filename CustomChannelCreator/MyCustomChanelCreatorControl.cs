@@ -398,20 +398,6 @@ namespace CustomChannelCreator
                 this.viewId.Items.AddRange(results.Entities.Select(x => new ComboboxItem(x.GetAttributeValue<string>("name"), x)).OrderBy(x => x.Text).ToArray());
             }
         }
-
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label7_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
+      
     }
 }

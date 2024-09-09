@@ -223,7 +223,7 @@ namespace CustomChannelCreator
             this.label3.Size = new System.Drawing.Size(105, 16);
             this.label3.TabIndex = 16;
             this.label3.Text = "Entity Reference";
-            this.label3.Click += new System.EventHandler(this.label3_Click);
+            
             // 
             // listView1
             // 
@@ -250,7 +250,6 @@ namespace CustomChannelCreator
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.UseWaitCursor = true;
             this.listView1.View = System.Windows.Forms.View.Details;
-            this.listView1.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
             // 
             // messagepartnamecolumn
             // 
@@ -359,7 +358,6 @@ namespace CustomChannelCreator
             this.label7.Size = new System.Drawing.Size(137, 16);
             this.label7.TabIndex = 27;
             this.label7.Text = "View Entity Reference";
-            this.label7.Click += new System.EventHandler(this.label7_Click);
             // 
             // required
             // 
