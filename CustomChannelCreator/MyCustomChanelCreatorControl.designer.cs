@@ -54,6 +54,7 @@ namespace CustomChannelCreator
             this.listView1 = new System.Windows.Forms.ListView();
             this.messagepartnamecolumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.typecolumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.RequiredHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.entitylookupcolumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.viewIdColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.solutionName = new System.Windows.Forms.TextBox();
@@ -66,7 +67,7 @@ namespace CustomChannelCreator
             this.viewId = new System.Windows.Forms.ComboBox();
             this.label7 = new System.Windows.Forms.Label();
             this.required = new System.Windows.Forms.CheckBox();
-            this.RequiredHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -78,11 +79,12 @@ namespace CustomChannelCreator
             this.toolStripSeparator1,
             this.LoadEntities,
             this.tssSeparator1,
-            this.Create});
+            this.Create,
+            this.toolStripButton1});
             this.toolStripMenu.Location = new System.Drawing.Point(0, 0);
             this.toolStripMenu.Name = "toolStripMenu";
             this.toolStripMenu.Padding = new System.Windows.Forms.Padding(0, 0, 3, 0);
-            this.toolStripMenu.Size = new System.Drawing.Size(1551, 27);
+            this.toolStripMenu.Size = new System.Drawing.Size(1551, 31);
             this.toolStripMenu.TabIndex = 4;
             this.toolStripMenu.Text = "toolStrip1";
             // 
@@ -90,14 +92,14 @@ namespace CustomChannelCreator
             // 
             this.tsbClose.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.tsbClose.Name = "tsbClose";
-            this.tsbClose.Size = new System.Drawing.Size(107, 24);
+            this.tsbClose.Size = new System.Drawing.Size(107, 28);
             this.tsbClose.Text = "Close this tool";
             this.tsbClose.Click += new System.EventHandler(this.tsbClose_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 31);
             // 
             // LoadEntities
             // 
@@ -105,21 +107,21 @@ namespace CustomChannelCreator
             this.LoadEntities.Image = ((System.Drawing.Image)(resources.GetObject("LoadEntities.Image")));
             this.LoadEntities.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.LoadEntities.Name = "LoadEntities";
-            this.LoadEntities.Size = new System.Drawing.Size(94, 24);
+            this.LoadEntities.Size = new System.Drawing.Size(94, 28);
             this.LoadEntities.Text = "LoadEntities";
             this.LoadEntities.Click += new System.EventHandler(this.Load_Click_1);
             // 
             // tssSeparator1
             // 
             this.tssSeparator1.Name = "tssSeparator1";
-            this.tssSeparator1.Size = new System.Drawing.Size(6, 27);
+            this.tssSeparator1.Size = new System.Drawing.Size(6, 31);
             // 
             // Create
             // 
             this.Create.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.Create.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.Create.Name = "Create";
-            this.Create.Size = new System.Drawing.Size(56, 24);
+            this.Create.Size = new System.Drawing.Size(56, 28);
             this.Create.Text = "Create";
             this.Create.ToolTipText = "Create";
             this.Create.Click += new System.EventHandler(this.Create_Click);
@@ -223,7 +225,6 @@ namespace CustomChannelCreator
             this.label3.Size = new System.Drawing.Size(105, 16);
             this.label3.TabIndex = 16;
             this.label3.Text = "Entity Reference";
-            
             // 
             // listView1
             // 
@@ -261,15 +262,18 @@ namespace CustomChannelCreator
             this.typecolumn.Text = "Type";
             this.typecolumn.Width = 100;
             // 
+            // RequiredHeader
+            // 
+            this.RequiredHeader.Text = "Required";
+            this.RequiredHeader.Width = 113;
+            // 
             // entitylookupcolumn
             // 
-            this.entitylookupcolumn.DisplayIndex = 2;
             this.entitylookupcolumn.Text = "Entity Lookup";
             this.entitylookupcolumn.Width = 100;
             // 
             // viewIdColumn
             // 
-            this.viewIdColumn.DisplayIndex = 3;
             this.viewIdColumn.Text = "Entity View";
             this.viewIdColumn.Width = 150;
             // 
@@ -304,6 +308,8 @@ namespace CustomChannelCreator
             // 
             // publisher
             // 
+            this.publisher.AccessibleDescription = "Publisher with which to create the solution";
+            this.publisher.AccessibleName = "Publisher";
             this.publisher.FormattingEnabled = true;
             this.publisher.Location = new System.Drawing.Point(179, 85);
             this.publisher.Margin = new System.Windows.Forms.Padding(4);
@@ -369,10 +375,15 @@ namespace CustomChannelCreator
             this.required.Text = "Required";
             this.required.UseVisualStyleBackColor = true;
             // 
-            // RequiredHeader
+            // toolStripButton1
             // 
-            this.RequiredHeader.Text = "Required";
-            this.RequiredHeader.Width = 113;
+            this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton1.Image")));
+            this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton1.Name = "toolStripButton1";
+            this.toolStripButton1.Size = new System.Drawing.Size(29, 28);
+            this.toolStripButton1.Text = "toolStripButton1";
+            this.toolStripButton1.ToolTipText = resources.GetString("toolStripButton1.ToolTipText");
             // 
             // CustomChannelCreator
             // 
@@ -468,5 +479,6 @@ namespace CustomChannelCreator
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ColumnHeader RequiredHeader;
         private System.Windows.Forms.CheckBox required;
+        private System.Windows.Forms.ToolStripButton toolStripButton1;
     }
 }

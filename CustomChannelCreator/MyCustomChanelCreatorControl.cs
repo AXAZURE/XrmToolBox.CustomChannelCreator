@@ -21,6 +21,7 @@ using System.Windows.Forms;
 using System.Windows.Media.Animation;
 using System.Xml;
 using XrmToolBox.Extensibility;
+using static System.Windows.Forms.ListView;
 using Label = Microsoft.Xrm.Sdk.Label;
 using ListViewItem = System.Windows.Forms.ListViewItem;
 //using XrmToolBox.Extensibility;
@@ -74,13 +75,15 @@ namespace CustomChannelCreator
         {
             List<ListBoxItem> retorno = new List<ListBoxItem>();
 
-            Dictionary<string, string> items = new Dictionary<string, string>();
-            items.Add("192350000", "Text");
-            items.Add("192350001", "Html");
-            items.Add("192350002", "Url");
-            items.Add("192350003", "File");
-            items.Add("192350004", "Image");
-            items.Add("192350005", "Lookup");
+            Dictionary<string, string> items = new Dictionary<string, string>
+            {
+                { "192350000", "Text" },
+                { "192350001", "Html" },
+                { "192350002", "Url" },
+                { "192350003", "File" },
+                { "192350004", "Image" },
+                { "192350005", "Lookup" }
+            };
 
             foreach (var pair in items)
             {
@@ -168,16 +171,29 @@ namespace CustomChannelCreator
             this.type.Text = selected.Value;
 
         }
-        private void addButton_Click(object sender, EventArgs e)
+        public delegate void AddItemCallback();
+        void AddItem()
         {
             var name = this.messagePartName.Text;
             var lookup = this.lookUp.SelectedItem != null ? (this.lookUp.SelectedItem as CustomListBoxItem).ToString() : "";
             var type = this.type.Text;
             var view = this.viewId.SelectedItem != null ? (this.viewId.SelectedItem as ComboboxItem)?.Value.Id.ToString() : "";
             var isRequired = this.required.Checked;
-            string[] row = { name, type,isRequired.ToString(), lookup, view };
+            string[] row = { name, type, isRequired.ToString(), lookup, view };
+            this.listView1.Items.Add(new System.Windows.Forms.ListViewItem(row));
+        }
+        private void addButton_Click(object sender, EventArgs e)
+        {
+            //var name = this.messagePartName.Text;
+            //var lookup = this.lookUp.SelectedItem != null ? (this.lookUp.SelectedItem as CustomListBoxItem).ToString() : "";
+            //var type = this.type.Text;
+            //var view = this.viewId.SelectedItem != null ? (this.viewId.SelectedItem as ComboboxItem)?.Value.Id.ToString() : "";
+            //var isRequired = this.required.Checked;
+            //string[] row = { name, type, isRequired.ToString(), lookup, view };
 
-            listView1.Items.Add(new System.Windows.Forms.ListViewItem(row));
+            var @delegate = new AddItemCallback(AddItem);
+            this.Invoke( @delegate );
+            //listView1.Items.Add(new System.Windows.Forms.ListViewItem(row));
             messagePartName.Enabled = false;
             messagePartName.Text = string.Empty;
             lookUp.Enabled = false;
@@ -189,7 +205,22 @@ namespace CustomChannelCreator
             this.viewId.Items.Clear();
 
         }
+        public delegate ComboboxItem GetValueCallback(System.Windows.Forms.ComboBox item);
+        ComboboxItem getValue(System.Windows.Forms.ComboBox item)
+        {
+            return item.SelectedItem as ComboboxItem;
+        }
+        public delegate IEnumerable<ListViewItem> GetListViewItemsCallback(System.Windows.Forms.ListView item);
 
+        public IEnumerable<ListViewItem> GetListViewItems(System.Windows.Forms.ListView list)
+        {
+            var ret = new List<ListViewItem>();
+            foreach (ListViewItem item in list.Items)
+            {
+                ret.Add(item);
+            }
+            return ret;
+                    }
         private void Create_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
@@ -198,8 +229,11 @@ namespace CustomChannelCreator
                 Message = "Loading...",
                 Work = (w, events) =>
                 {
+                    w.WorkerReportsProgress = true;
                     var solutionName = this.solutionName.Text;
-                    var publisher = this.publisher.SelectedItem as ComboboxItem;
+                    var @delegate = new GetValueCallback(getValue);
+                    var publisher = this.Invoke(@delegate, this.publisher) as ComboboxItem;
+                    //var publisher = this.publisher.SelectedItem as ComboboxItem;
                     w.ReportProgress(-1, "Creating solution...");
                     Entity solution = new Entity("solution");
                     solution.Attributes.Add("uniquename", solutionName.Replace(" ", string.Empty));
@@ -267,9 +301,10 @@ namespace CustomChannelCreator
                     formQuery.Criteria.AddCondition("objecttypecode", ConditionOperator.Equal, retrieveEntityResponse.EntityMetadata.ObjectTypeCode);
                     formQuery.Criteria.AddCondition("type", ConditionOperator.Equal, 2);
                     var form = this.Service.RetrieveMultiple(formQuery);
+                    
+                    var customAPISelected = this.Invoke(@delegate, this.customApi) as ComboboxItem;
 
-
-                    Entity channelDefinition = Utils.CreateChannelDefinition(this.Service, entityChannelInstanceSchema, form.Entities.FirstOrDefault()?.Id.ToString(), entityChannelInstance, (this.customApi.SelectedItem as ComboboxItem).Text);
+                    Entity channelDefinition = Utils.CreateChannelDefinition(this.Service, entityChannelInstanceSchema, form.Entities.FirstOrDefault()?.Id.ToString(), entityChannelInstance, customAPISelected.Text);
 
                     var retrieveEntityChannelDefinitionResponse = Utils.RetrieveEntityMetadata(this.Service, "msdyn_channeldefinition");
 
@@ -285,7 +320,9 @@ namespace CustomChannelCreator
                     var retrieveEntityChannelDefinitionMessagepartResponse = Utils.RetrieveEntityMetadata(this.Service, "msdyn_channelmessagepart");
 
                     List<Entity> messageParts = new List<Entity>();
-                    foreach (ListViewItem mp in this.listView1.Items)
+                    var @delegateListViewItesm = new GetListViewItemsCallback(GetListViewItems);
+                    var listViewItems = this.Invoke(@delegateListViewItesm, this.listView1) as List<ListViewItem>;
+                    foreach (ListViewItem mp in listViewItems)
                     {
                         Entity messagePart = Utils.CreateMessagePart(this.Service, channelDefinition, mp.SubItems[0].Text, mp.SubItems[1].Text, mp.SubItems[3].Text, mp.SubItems[4].Text, mp.SubItems[2].Text);
                         messageParts.Add(messagePart);
@@ -299,12 +336,17 @@ namespace CustomChannelCreator
                     }
 
                 },
+                 ProgressChanged = events =>
+                 {
+                     // it will display "I have found the user id" in this example
+                     SetWorkingMessage(events.UserState.ToString());
+                 },
                 AsyncArgument = null,
                 // Progress information panel size
                 MessageWidth = 340,
                 MessageHeight = 150
             });
-            
+
             Cursor = Cursors.Default;
         }
 
@@ -342,7 +384,6 @@ namespace CustomChannelCreator
                     //this.customApi.Items.AddRange(itemsCAPI);
                     w.ReportProgress(-1, "Setting messageparts types");
 
-
                     RetrieveAllEntitiesRequest retrieveAllEntitiesRequest = new RetrieveAllEntitiesRequest();
                     retrieveAllEntitiesRequest.EntityFilters = EntityFilters.Entity;
                     retrieveAllEntitiesRequest.RetrieveAsIfPublished = false;
@@ -358,9 +399,12 @@ namespace CustomChannelCreator
                 },
                 PostWorkCallBack = events =>
                 {
-                    this.publisher.Items.AddRange(items.ToArray());
-                    this.customApi.Items.AddRange(itemsCAPI.ToArray());
-                    this.lookUp.Items.AddRange(messageParts.ToArray());
+                    var @delegate = new FillControlsCalback(FillControls);
+                    //this.publisher.BeginInvoke(@delegate, );
+                    this.Invoke(@delegate,items, itemsCAPI, messageParts );
+                    //this.publisher.Items.AddRange(items.ToArray());
+                    //this.customApi.Items.AddRange(itemsCAPI.ToArray());
+                    //this.lookUp.Items.AddRange(messageParts.ToArray());
                     List<CustomListBoxItem> listBox = new List<CustomListBoxItem>
                     {
                         new CustomListBoxItem("Text", "192350000"),
@@ -381,9 +425,16 @@ namespace CustomChannelCreator
                 MessageWidth = 340,
                 MessageHeight = 150
             });
-            
+
             this.Cursor = Cursors.Default;
         }
+        void FillControls(IEnumerable<ComboboxItem> publishers, IEnumerable<ComboboxItem> customApis, IEnumerable<CustomListBoxItem> messages)
+        {
+            this.publisher.Items.AddRange(publishers.ToArray());
+            this.customApi.Items.AddRange(customApis.ToArray());
+            this.lookUp.Items.AddRange(messages.ToArray());
+        }
+        public delegate void FillControlsCalback(IEnumerable<ComboboxItem> publishers, IEnumerable<ComboboxItem> customApis, IEnumerable<CustomListBoxItem> messages);
         private void lookUp_SelectedIndexChanged(object sender, EventArgs e)
         {
             // Set Condition Values
@@ -398,6 +449,10 @@ namespace CustomChannelCreator
                 this.viewId.Items.AddRange(results.Entities.Select(x => new ComboboxItem(x.GetAttributeValue<string>("name"), x)).OrderBy(x => x.Text).ToArray());
             }
         }
-      
+
+        private void toolTip1_Popup(object sender, PopupEventArgs e)
+        {
+
+        }
     }
 }
